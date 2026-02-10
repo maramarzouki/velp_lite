@@ -1,0 +1,73 @@
+class PetEntity {
+  final int? id;
+  final String name;
+  final String species;
+  final String breed;
+  final DateTime birthDate;
+  final String gender;
+  final double weight;
+  final String color;
+  final String chipNumber;
+
+  const PetEntity({
+    this.id,
+    required this.name,
+    required this.species,
+    required this.breed,
+    required this.birthDate,
+    required this.gender,
+    required this.weight,
+    required this.color,
+    required this.chipNumber,
+  });
+
+  /// computed age (years)
+  int get ageYears {
+    final today = DateTime.now();
+    int ageYears = today.year - birthDate.year;
+
+    if (today.month < birthDate.month ||
+        (today.month == birthDate.month && today.day < birthDate.day)) {
+      ageYears--;
+    }
+    return ageYears;
+  }
+
+  int get ageMonths {
+    final today = DateTime.now();
+    int months =
+        (today.year - birthDate.year) * 12 + (today.month - birthDate.month);
+    if (today.day < birthDate.day) months--;
+    return months;
+  }
+
+  /// Human-friendly label: "2 years" or "7 months" or "Less than 1 month"
+  String get ageLabel {
+    final years = ageYears;
+    if (years >= 1) {
+      return years == 1 ? '1 year' : '$years years';
+    }
+
+    final months = ageMonths;
+    if (months <= 0) return 'Less than 1 month';
+    return months == 1 ? '1 month' : '$months months';
+  }
+
+  String get emoji {
+    switch (species) {
+      case 'Dog':
+        return '🐕';
+      case 'Cat':
+        return '🐱';
+      case 'Bird':
+        return '🐦‍⬛';
+      case 'Fish':
+        return '🐟';
+      case 'Rabbit':
+        return '🐰';
+      case 'Other':
+        return '🐾';
+    }
+    return '🐾';
+  }
+}
