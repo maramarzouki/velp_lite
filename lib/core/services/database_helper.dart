@@ -15,7 +15,13 @@ class DatabaseHelper {
   Future<Database> _initDB(String fileName) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, fileName);
-    return await openDatabase(path, version: 1, onCreate: _onCreate);
+    // return await openDatabase(path, version: 1, onCreate: _onCreate);
+    return await openDatabase(
+      path,
+      version: 2, // ← Change to 2
+      onCreate: _onCreate,
+      onUpgrade: _onUpgrade, // ← Add this
+    );
   }
 
   Future _onCreate(Database db, int version) async {
@@ -36,7 +42,7 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE rdvs(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        animal_id TEXT NOT NULL,
+        animal_id INTEGER NOT NULL,
         vet TEXT,
         date TEXT NOT NULL,
         is_confirmed INTEGER NOT NULL
@@ -51,6 +57,22 @@ class DatabaseHelper {
         timestamp TEXT NOT NULL
       )
     ''');
+  }
+
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('DROP TABLE IF EXISTS rdvs');
+
+      await db.execute('''
+      CREATE TABLE rdvs(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        animal_id INTEGER NOT NULL,
+        vet TEXT,
+        date TEXT NOT NULL,
+        is_confirmed INTEGER NOT NULL
+      )
+    ''');
+    }
   }
 
   Future close() async {

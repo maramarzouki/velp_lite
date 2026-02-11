@@ -30,14 +30,14 @@ class _AddPetScreenState extends ConsumerState<AddPetScreen> {
 
   final List<String> _species = ['Dog', 'Cat', 'Bird', 'Rabbit', 'Other'];
   final List<String> _genders = ['Male', 'Female'];
-  final Map<String, String> _speciesEmojis = {
-    'Dog': '🐕',
-    'Cat': '🐱',
-    'Bird': '🦜',
-    'Rabbit': '🐰',
-    'Other': '🐾',
-  };
-
+    // final Map<String, String> _speciesEmojis = {
+    //   'Dog': '🐕',
+    //   'Cat': '🐱',
+    //   'Bird': '🦜',
+    //   'Rabbit': '🐰',
+    //   'Other': '🐾',
+    // };
+  
   @override
   void dispose() {
     _nameController.dispose();
@@ -74,97 +74,19 @@ class _AddPetScreenState extends ConsumerState<AddPetScreen> {
     }
   }
 
-  void _savePet0() {
+  void _savePet() {
     if (_addPetFormKey.currentState!.validate()) {
-      if (_selectedSpecies == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Please select a species'),
-            backgroundColor: AppColors.background,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        );
-        return;
-      }
-      if (_selectedGender == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Please select a gender'),
-            backgroundColor: AppColors.background,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        );
-        return;
-      }
-      if (_birthDate == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Please select a birth date'),
-            backgroundColor: AppColors.background,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        );
-        return;
-      }
-
-      // Create pet object
-      final petData = {
-        'name': _nameController.text,
-        'species': _selectedSpecies,
-        'breed': _breedController.text,
-        'birthDate': _birthDate,
-        'gender': _selectedGender,
-        'weight': double.tryParse(_weightController.text) ?? 0.0,
-        'color': _colorController.text,
-        'chipNumber': _chipNumberController.text,
-        'emoji': _selectedEmoji,
-      };
-
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle, color: AppColors.white),
-              const SizedBox(width: 12),
-              Text('${_nameController.text} added successfully!'),
-            ],
-          ),
-          backgroundColor: AppColors.accent,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
+      PetEntity petEntity = PetEntity(
+        name: _nameController.text,
+        species: _selectedSpecies!,
+        breed: _breedController.text,
+        birthDate: _birthDate!,
+        gender: _selectedGender!,
+        weight: double.tryParse(_weightController.text) ?? 0.0,
+        color: _colorController.text,
+        chipNumber: _chipNumberController.text,
       );
 
-      // Navigate back
-      Navigator.pop(context, petData);
-    }
-  }
-
-  void _savePet(WidgetRef ref) {
-    PetEntity petEntity = PetEntity(
-      name: _nameController.text,
-      species: _selectedSpecies!,
-      breed: _breedController.text,
-      birthDate: _birthDate!,
-      gender: _selectedGender!,
-      weight: double.tryParse(_weightController.text) ?? 0.0,
-      color: _colorController.text,
-      chipNumber: _chipNumberController.text,
-    );
-
-    if (_addPetFormKey.currentState!.validate()) {
       ref.read(petViewModelProvider.notifier).addPet(petEntity);
       ScaffoldMessenger.of(
         context,
@@ -455,7 +377,7 @@ class _AddPetScreenState extends ConsumerState<AddPetScreen> {
                         width: double.infinity,
                         height: 56,
                         child: ElevatedButton(
-                          onPressed: () => _savePet(ref),
+                          onPressed: () => _savePet(),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             foregroundColor: AppColors.white,

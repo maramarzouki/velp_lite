@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:velp_lite/core/models/rdv_model.dart';
+import 'package:velp_lite/features/rdv/data/model/rdv_model.dart';
 import 'package:velp_lite/core/services/database_helper.dart';
 
 final rdvDbHelperProvider = Provider<RdvDbHelper>(
@@ -23,9 +23,9 @@ class RdvDbHelper {
     return maps.map((m) => RdvModel.fromMap(m)).toList();
   }
 
-  Future<RdvModel> getRdv(int id) async {
+  Future<RdvModel> getRdvByAnimalId(int id) async {
     final db = await DatabaseHelper.instance.database;
-    final maps = await db.query('rdvs', where: 'id = ?', whereArgs: [id]);
+    final maps = await db.query('rdvs', where: 'animal_id = ?', whereArgs: [id]);
 
     if (maps.isNotEmpty) {
       return RdvModel.fromMap(maps.first);

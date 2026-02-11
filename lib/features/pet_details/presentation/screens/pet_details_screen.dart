@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:velp_lite/core/entities/pet_entity.dart';
 import 'package:velp_lite/core/theme/app_colors.dart';
+import 'package:velp_lite/features/rdv/presentation/screens/schedule_vet_screen.dart';
 
 class PetDetailsScreen extends StatefulWidget {
   final PetEntity pet;
@@ -255,7 +256,9 @@ class _PetDetailsScreenState extends State<PetDetailsScreen>
                               label: 'Schedule Vet',
                               icon: Icons.calendar_today_outlined,
                               color: AppColors.accent,
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(context, MaterialPageRoute(builder: (_)=>ScheduleVetScreen(pet: widget.pet)));
+                              },
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -394,13 +397,6 @@ class _PetDetailsScreenState extends State<PetDetailsScreen>
               value: pet.ageLabel.toString(),
               color: AppColors.accent,
             ),
-            const SizedBox(height: 16),
-            _buildInfoRow(
-              emoji: '📍',
-              label: 'Location',
-              value: 'San Francisco, CA',
-              color: AppColors.accent,
-            ),
           ],
         ),
         const SizedBox(height: 16),
@@ -411,7 +407,7 @@ class _PetDetailsScreenState extends State<PetDetailsScreen>
           accentColor: AppColors.secondary,
           children: [
             Text(
-              'Luna is a friendly and energetic Golden Retriever who loves playing fetch and going on long walks. She\'s great with kids and other pets!',
+              '${pet.name} is a friendly and energetic ${pet.breed} who loves playing fetch and going on long walks.',
               style: TextStyle(
                 color: AppColors.text,
                 fontSize: 15,

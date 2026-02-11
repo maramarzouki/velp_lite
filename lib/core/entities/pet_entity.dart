@@ -41,7 +41,7 @@ class PetEntity {
     return months;
   }
 
-  /// Human-friendly label: "2 years" or "7 months" or "Less than 1 month"
+  /// label: "2 years" or "7 months" or "Less than 1 month"
   String get ageLabel {
     final years = ageYears;
     if (years >= 1) {
@@ -69,5 +69,10 @@ class PetEntity {
         return '🐾';
     }
     return '🐾';
+  }
+
+  @override
+  String toString() {
+    return 'PetEntity(id: $id, name: $name, species: $species, breed: $breed, birthDate: $birthDate, gender: $gender, weight: $weight, color: $color, chipNumber: $chipNumber)';
   }
 }
