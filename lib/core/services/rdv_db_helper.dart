@@ -23,15 +23,11 @@ class RdvDbHelper {
     return maps.map((m) => RdvModel.fromMap(m)).toList();
   }
 
-  Future<RdvModel> getRdvByAnimalId(int id) async {
+  Future<List<RdvModel>> getRdvByAnimalId(int id) async {
     final db = await DatabaseHelper.instance.database;
     final maps = await db.query('rdvs', where: 'animal_id = ?', whereArgs: [id]);
 
-    if (maps.isNotEmpty) {
-      return RdvModel.fromMap(maps.first);
-    } else {
-      throw Exception('Rdv not found');
-    }
+    return maps.map((m) => RdvModel.fromMap(m)).toList();
   }
 
   Future<int> updateRdv(RdvModel rdv) async {

@@ -29,12 +29,12 @@ class RdvViewModel extends AsyncNotifier<List<RdvEntity>> {
     }
   }
 
-  Future<void> getRdvByAnimalId(int id) async {
+  Future<List<RdvEntity>> getRdvByAnimalId(int id) async {
     try {
-      await repo.getRdvByAnimalId(id);
+      return await repo.getRdvByAnimalId(id);
     } catch (e) {
       debugPrint('Error getting rdv: $e');
-      return;
+      throw Exception('Error getting rdv: $e');
     }
   }
 

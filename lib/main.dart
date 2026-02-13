@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:velp_lite/features/auth/presentation/screens/login_screen.dart';
-import 'package:velp_lite/features/home/presentation/screens/home_screen.dart';
+import 'package:velp_lite/features/auth/presentation/screens/register_screen.dart';
 
 void main() {
   runApp(ProviderScope(child: MyApp()));
@@ -18,7 +17,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: HomeScreen(),
+      home: RegisterScreen(),
     );
   }
 }

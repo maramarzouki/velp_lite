@@ -22,9 +22,9 @@ class RdvRepository {
     return rdvs.map((e)=>e.toEntity()).toList();
   }
 
-  Future<RdvEntity> getRdvByAnimalId(int id) async {
+  Future<List<RdvEntity>> getRdvByAnimalId(int id) async {
     final rdv = await db.getRdvByAnimalId(id);
-    return rdv.toEntity();
+    return rdv.map((e)=>e.toEntity()).toList();
   }
 
   Future<int> updateRdv(RdvEntity rdv) async {

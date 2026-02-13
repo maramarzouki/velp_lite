@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:velp_lite/core/entities/pet_entity.dart';
+import 'package:velp_lite/core/entities/rdv_entity.dart';
+import 'package:velp_lite/core/providers/rdv_providers.dart';
 import 'package:velp_lite/core/theme/app_colors.dart';
 import 'package:velp_lite/features/rdv/presentation/screens/schedule_vet_screen.dart';
 
-class PetDetailsScreen extends StatefulWidget {
+class PetDetailsScreen extends ConsumerStatefulWidget {
   final PetEntity pet;
   const PetDetailsScreen({super.key, required this.pet});
 
   @override
-  State<PetDetailsScreen> createState() => _PetDetailsScreenState();
+  ConsumerState<PetDetailsScreen> createState() => _PetDetailsScreenState();
 }
 
-class _PetDetailsScreenState extends State<PetDetailsScreen>
+class _PetDetailsScreenState extends ConsumerState<PetDetailsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _currentTabIndex = 0;
@@ -44,6 +48,14 @@ class _PetDetailsScreenState extends State<PetDetailsScreen>
     //   'gender': 'Female',
     //   'emoji': '🐕',
     // };
+
+    final rdvVMProvider = ref.watch(rdvViewModelProvider);
+
+    final List<RdvEntity> appointments = rdvVMProvider.when(
+      data: (data) => data.where((r) => r.animalID == widget.pet.id).toList(),
+      error: (error, stackTrace) => [],
+      loading: () => [],
+    );
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -210,7 +222,9 @@ class _PetDetailsScreenState extends State<PetDetailsScreen>
                             const SizedBox(width: 12),
                             Expanded(
                               child: _buildStatCard(
-                                emoji: widget.pet.gender == 'Female' ? '♀️' : '♂️',
+                                emoji: widget.pet.gender == 'Female'
+                                    ? '♀️'
+                                    : '♂️',
                                 value: widget.pet.gender,
                                 label: 'Gender',
                               ),
@@ -242,7 +256,11 @@ class _PetDetailsScreenState extends State<PetDetailsScreen>
                       offset: const Offset(0, -20),
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                        child: _buildTabContent(_currentTabIndex, widget.pet),
+                        child: _buildTabContent(
+                          _currentTabIndex,
+                          widget.pet,
+                          appointments,
+                        ),
                       ),
                     ),
 
@@ -257,7 +275,13 @@ class _PetDetailsScreenState extends State<PetDetailsScreen>
                               icon: Icons.calendar_today_outlined,
                               color: AppColors.accent,
                               onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (_)=>ScheduleVetScreen(pet: widget.pet)));
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        ScheduleVetScreen(pet: widget.pet),
+                                  ),
+                                );
                               },
                             ),
                           ),
@@ -363,12 +387,16 @@ class _PetDetailsScreenState extends State<PetDetailsScreen>
     );
   }
 
-  Widget _buildTabContent(int index, PetEntity pet) {
+  Widget _buildTabContent(
+    int index,
+    PetEntity pet,
+    List<RdvEntity> appointments,
+  ) {
     switch (index) {
       case 0:
         return _buildInfoTab(pet);
       case 1:
-        return _buildMedicalTab();
+        return _buildMedicalTab(pet, appointments);
       case 2:
         return _buildPhotosTab();
       default:
@@ -420,33 +448,80 @@ class _PetDetailsScreenState extends State<PetDetailsScreen>
     );
   }
 
-  Widget _buildMedicalTab() {
-    return _buildInfoCard(
-      title: 'Medical Records',
-      accentColor: AppColors.secondary,
+  Widget _buildMedicalTab(PetEntity pet, List<RdvEntity> appointments) {
+    return Column(
       children: [
-        _buildInfoRow(
-          icon: Icons.description_outlined,
-          label: 'Last Checkup',
-          value: 'January 15, 2026',
-          color: AppColors.secondary,
+        _buildInfoCard(
+          title: 'Appointments',
+          accentColor: AppColors.secondary,
+          children: [
+            if (appointments.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: Center(
+                  child: Text(
+                    'No appointments yet',
+                    style: TextStyle(color: AppColors.lightText, fontSize: 16),
+                  ),
+                ),
+              )
+            else
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: appointments.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  final appointment = appointments[index];
+                  return _buildAppointmentCard(appointment);
+                },
+              ),
+          ],
         ),
+
         const SizedBox(height: 16),
-        _buildInfoRow(
-          emoji: '💉',
-          label: 'Vaccinations',
-          value: 'Up to date ✓',
-          color: AppColors.secondary,
-        ),
-        const SizedBox(height: 16),
-        _buildInfoRow(
-          emoji: '🏥',
-          label: 'Veterinarian',
-          value: 'Dr. Sarah Wilson',
-          color: AppColors.secondary,
-        ),
+
+        // Optional: Quick action inside the tab
+        // _buildActionButton(
+        //   label: 'Schedule New Appointment',
+        //   icon: Icons.add,
+        //   color: AppColors.accent,
+        //   onPressed: () {
+        //     Navigator.push(
+        //       context,
+        //       MaterialPageRoute(builder: (_) => ScheduleVetScreen(pet: pet)),
+        //     );
+        //   },
+        // ),
+      
       ],
     );
+    // return _buildInfoCard(
+    //   title: 'Medical Records',
+    //   accentColor: AppColors.secondary,
+    //   children: [
+    //     _buildInfoRow(
+    //       icon: Icons.description_outlined,
+    //       label: 'Last Checkup',
+    //       value: 'January 15, 2026',
+    //       color: AppColors.secondary,
+    //     ),
+    //     const SizedBox(height: 16),
+    //     _buildInfoRow(
+    //       emoji: '💉',
+    //       label: 'Vaccinations',
+    //       value: 'Up to date ✓',
+    //       color: AppColors.secondary,
+    //     ),
+    //     const SizedBox(height: 16),
+    //     _buildInfoRow(
+    //       emoji: '🏥',
+    //       label: 'Veterinarian',
+    //       value: 'Dr. Sarah Wilson',
+    //       color: AppColors.secondary,
+    //     ),
+    //   ],
+    // );
   }
 
   Widget _buildPhotosTab() {
@@ -616,4 +691,148 @@ class _PetDetailsScreenState extends State<PetDetailsScreen>
       ),
     );
   }
+}
+
+Widget _buildAppointmentCard(RdvEntity appt) {
+  // final isUpcoming = appt.status == 'upcoming';
+  // final isCompleted = appt.status == 'completed';
+
+  final isUpcoming = appt.date.isAfter(DateTime.now());
+  // final isCompleted = appt.date.isBefore(DateTime.now());
+
+  return Container(
+    decoration: BoxDecoration(
+      color: AppColors.white,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: .06),
+          blurRadius: 12,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          // Date Box
+          Container(
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              color: isUpcoming
+                  ? AppColors.accent.withValues(alpha: 0.1)
+                  : Colors.grey[100],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  appt.date.day.toString(),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: isUpcoming ? AppColors.accent : Colors.grey[700],
+                  ),
+                ),
+                Text(
+                  _getMonthShort(appt.date.month),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isUpcoming ? AppColors.accent : Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          // Details
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      DateFormat.Hm().format(appt.date),
+                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                    ),
+                    const Spacer(),
+                    // _buildStatusChip(appt.status),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                // Text(
+                //   appt.reason,
+                //   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                // ),
+                const SizedBox(height: 4),
+                Text(
+                  "Dr. ${appt.vet}",
+                  style: TextStyle(color: AppColors.lightText, fontSize: 14),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+// Widget _buildStatusChip(String status) {
+//   Color color;
+//   String text;
+
+//   switch (status) {
+//     case 'upcoming':
+//       color = Colors.orange;
+//       text = 'Upcoming';
+//       break;
+//     case 'completed':
+//       color = Colors.green;
+//       text = 'Completed';
+//       break;
+//     case 'cancelled':
+//       color = Colors.red;
+//       text = 'Cancelled';
+//       break;
+//     default:
+//       color = Colors.grey;
+//       text = status;
+//   }
+
+//   return Container(
+//     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+//     decoration: BoxDecoration(
+//       color: color.withValues(alpha: 0.1),
+//       borderRadius: BorderRadius.circular(20),
+//     ),
+//     child: Text(
+//       text,
+//       style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w600),
+//     ),
+//   );
+// }
+
+String _getMonthShort(int month) {
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+  return months[month - 1];
 }

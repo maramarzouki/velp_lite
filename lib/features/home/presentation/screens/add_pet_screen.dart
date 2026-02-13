@@ -30,14 +30,14 @@ class _AddPetScreenState extends ConsumerState<AddPetScreen> {
 
   final List<String> _species = ['Dog', 'Cat', 'Bird', 'Rabbit', 'Other'];
   final List<String> _genders = ['Male', 'Female'];
-    // final Map<String, String> _speciesEmojis = {
-    //   'Dog': '🐕',
-    //   'Cat': '🐱',
-    //   'Bird': '🦜',
-    //   'Rabbit': '🐰',
-    //   'Other': '🐾',
-    // };
-  
+  // final Map<String, String> _speciesEmojis = {
+  //   'Dog': '🐕',
+  //   'Cat': '🐱',
+  //   'Bird': '🦜',
+  //   'Rabbit': '🐰',
+  //   'Other': '🐾',
+  // };
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -85,6 +85,7 @@ class _AddPetScreenState extends ConsumerState<AddPetScreen> {
         weight: double.tryParse(_weightController.text) ?? 0.0,
         color: _colorController.text,
         chipNumber: _chipNumberController.text,
+        userID: 1,
       );
 
       ref.read(petViewModelProvider.notifier).addPet(petEntity);

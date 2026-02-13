@@ -10,6 +10,7 @@ class PetModel {
   double weight;
   String color;
   String chipNumber;
+  int userID;
 
   PetModel({
     this.id,
@@ -21,6 +22,7 @@ class PetModel {
     required this.weight,
     required this.color,
     required this.chipNumber,
+    required this.userID,
   });
 
   Map<String, dynamic> toMap() {
@@ -34,6 +36,7 @@ class PetModel {
       'weight': weight,
       'color': color,
       'chip_number': chipNumber,
+      'user_id': userID,
     };
   }
 
@@ -48,6 +51,7 @@ class PetModel {
       weight: map['weight'].toDouble() ?? 0.0,
       color: map['color'],
       chipNumber: map['chip_number'] ?? '',
+      userID: map['user_id'],
     );
   }
 
@@ -62,6 +66,7 @@ class PetModel {
       weight: weight,
       color: color,
       chipNumber: chipNumber,
+      userID: userID,
     );
   }
 
@@ -76,6 +81,7 @@ class PetModel {
       weight: entity.weight,
       color: entity.color,
       chipNumber: entity.chipNumber,
+      userID: entity.userID,
     );
   }
 }

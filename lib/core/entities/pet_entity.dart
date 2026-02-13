@@ -8,7 +8,8 @@ class PetEntity {
   final double weight;
   final String color;
   final String chipNumber;
-
+  final int userID;
+  
   const PetEntity({
     this.id,
     required this.name,
@@ -19,6 +20,7 @@ class PetEntity {
     required this.weight,
     required this.color,
     required this.chipNumber,
+    required this.userID,
   });
 
   /// computed age (years)
@@ -73,6 +75,6 @@ class PetEntity {
 
   @override
   String toString() {
-    return 'PetEntity(id: $id, name: $name, species: $species, breed: $breed, birthDate: $birthDate, gender: $gender, weight: $weight, color: $color, chipNumber: $chipNumber)';
+    return 'PetEntity(id: $id, name: $name, species: $species, breed: $breed, birthDate: $birthDate, gender: $gender, weight: $weight, color: $color, chipNumber: $chipNumber, userID: $userID)';
   }
 }

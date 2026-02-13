@@ -1,8 +1,5 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:velp_lite/core/models/message_model.dart';
 import 'package:velp_lite/core/services/database_helper.dart';
-
-final messageDbHelperProvider = Provider<MessageDbHelper>((ref) => MessageDbHelper.instance);
 
 class MessageDbHelper {
   static final MessageDbHelper instance = MessageDbHelper._init();
