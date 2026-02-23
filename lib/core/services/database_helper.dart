@@ -106,7 +106,7 @@ class DatabaseHelper {
       FOREIGN KEY (last_message_id) REFERENCES messages(id)
     )
   ''');
-  
+
     await db.insert('vets', {
       'name': 'Dr. Emily Carter',
       'email': 'emily.carter@greenvalleyvet.com',
@@ -120,7 +120,7 @@ class DatabaseHelper {
       'email': 'michael.thompson@citypetcare.com',
       'phone': '+15559876543',
       'specialty': 'Dermatology',
-      'clinic': 'City Pet Care Center',
+      'clinic': 'City Pet Care Center'
     });
 
     await db.insert('vets', {

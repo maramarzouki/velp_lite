@@ -8,31 +8,37 @@ import 'package:velp_lite/core/repositories/message_repository.dart';
 
 class MessageViewModel extends AsyncNotifier<List<MessageEntity>> {
   late final MessageRepository _repo;
+  final int roomId;
 
+  MessageViewModel(this.roomId);
+  
   @override
   Future<List<MessageEntity>> build() async {
-    _repo = await ref.read(messageRepositoryProvider);
-    return await _repo.getMessages();
-  }
+    _repo = ref.read(messageRepositoryProvider);
+    return await _repo.getMessages(roomId);
+  } 
 
-  Future<void> addMessage(MessageEntity msg) async {
-    state = const AsyncLoading();
+  Future<MessageEntity> addMessage(MessageEntity msg) async {
+    state = AsyncLoading();
     try {
       final newMessage = await _repo.addMessage(msg);
-      final updatedList = [...state.value ?? [], newMessage];
+      final updatedList = [...state.value ?? <MessageEntity>[], newMessage];
       state = AsyncData(updatedList);
+      return newMessage;
     } catch (e) {
       debugPrint('Error adding msg: $e');
       state = AsyncError(e, StackTrace.current);
+      rethrow;
     }
   }
 
-  Future<void> getMessages(int id) async {
+  Future<MessageEntity> getLastMessage(int roomId, int msgID) async {
     try {
-      await _repo.getMessage(id);
+      return await _repo.getLastMessage(roomId, msgID);
     } catch (e) {
-      debugPrint('Error getting msg: $e');
-      return;
+      debugPrint('Error getting last message: $e');
+      state = AsyncError(e, StackTrace.current);
+      rethrow;
     }
   }
 

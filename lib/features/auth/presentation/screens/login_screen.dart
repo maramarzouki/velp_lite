@@ -1,21 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:velp_lite/core/entities/user_entity.dart';
+import 'package:velp_lite/core/providers/user_providers.dart';
 import 'package:velp_lite/core/theme/app_colors.dart';
 import 'package:velp_lite/core/validators/validators.dart';
+import 'package:velp_lite/features/auth/presentation/screens/register_screen.dart';
 import 'package:velp_lite/features/home/presentation/screens/home_screen.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _emailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
   final _loginFormKey = GlobalKey<FormState>();
+
+  String errorMessage = '';
 
   @override
   void dispose() {
@@ -26,21 +33,43 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _signIn() {
+  void _signIn() async {
+    final prefs = await SharedPreferences.getInstance();
     if (_loginFormKey.currentState!.validate()) {
+      UserEntity userEntity = UserEntity(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
       try {
-        if (_emailController.text == 'test@velp.com' &&
-            _passwordController.text == '123456') {
+        final user = await ref
+            .read(userViewModelProvider.notifier)
+            .loginUser(userEntity);
+        await prefs.setInt('user_id', user.id!);
+        if (user.id != null) {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => HomeScreen()),
           );
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Invalid email or password')),
-          );
+          setState(() {
+            errorMessage = 'Invalid email or password';
+          });
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(errorMessage)));
         }
       } catch (e) {
+        String friendlyMessage = 'Login failed. Please try again.';
+        if (e.toString().contains('Incorrect password')) {
+          friendlyMessage =
+              'Oops! The password you entered is incorrect. Please double-check and try again.';
+        } else if (e.toString().contains('User not found')) {
+          friendlyMessage =
+              'Hmm, that email doesn\'t seem right. Please check it and try again.';
+        }
+        setState(() {
+          errorMessage = friendlyMessage;
+        });
         debugPrint(e.toString());
       }
     }
@@ -112,7 +141,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 8),
                       Text(
                         'Your pet\'s best friend',
-                        style: TextStyle(color: AppColors.lightText, fontSize: 15),
+                        style: TextStyle(
+                          color: AppColors.lightText,
+                          fontSize: 15,
+                        ),
                       ),
                     ],
                   ),
@@ -254,6 +286,15 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             const SizedBox(height: 24),
+                            if (errorMessage.isNotEmpty)
+                              Text(
+                                errorMessage,
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
 
                             // Sign In Button
                             SizedBox(
@@ -295,7 +336,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap: () {},
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => RegisterScreen(),
+                                      ),
+                                    );
+                                  },
                                   child: const Text(
                                     'Sign Up',
                                     style: TextStyle(

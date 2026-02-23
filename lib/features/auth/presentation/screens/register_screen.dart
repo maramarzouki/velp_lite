@@ -26,6 +26,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool _isConfirmPasswordVisible = false;
   bool _acceptTerms = false;
 
+  String errorMessage = '';
+
   @override
   void dispose() {
     _firstNameController.dispose();
@@ -36,49 +38,43 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
-  void _register() {
+  void _register() async {
     if (_registerFormKey.currentState!.validate()) {
-      if (!_acceptTerms) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Please accept the Terms & Conditions'),
-            backgroundColor: AppColors.secondary,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        );
-        return;
-      }
-
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle, color: AppColors.white),
-              const SizedBox(width: 12),
-              Text(
-                'Welcome ${_firstNameController.text} ${_lastNameController.text}! Account created successfully.',
-              ),
-            ],
-          ),
-          backgroundColor: AppColors.accent,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      );
-
-      UserEntity newUser = UserEntity(
+      UserEntity userEntity = UserEntity(
         firstName: _firstNameController.text,
         lastName: _lastNameController.text,
         email: _emailController.text,
         password: _passwordController.text,
       );
-      ref.read(userViewModelProvider.notifier).createUser(newUser);
+      try {
+        final user = await ref
+            .read(userViewModelProvider.notifier)
+            .createUser(userEntity);
+        debugPrint('user from register screen: $user');
+        if (user['user'] != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => LoginScreen()),
+          );
+        } else {
+          String friendlyError;
+          debugPrint('error from register screen: ${user['message']}');
+          if (user['message'].contains('Email already exists')) {
+            friendlyError = 'This email is already registered. Try logging in.';
+          } else {
+            friendlyError =
+                'Client error: An error occurred during registration. Please try again.';
+          }
+          setState(() {
+            errorMessage = friendlyError;
+          });
+        }
+      } catch (e) {
+        debugPrint('error from register screen: $e');
+        setState(() {
+          errorMessage = 'Server error: An error occurred during registration. Please try again.';
+        });
+      }
     }
   }
 
@@ -548,6 +544,32 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               },
                             ),
                             const SizedBox(height: 20),
+
+                            if (errorMessage.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Icon(
+                                      Icons.error_outline,
+                                      color: Colors.red,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        errorMessage,
+                                        style: const TextStyle(
+                                          color: Colors.red,
+                                          fontSize: 14,
+                                        ),
+                                        softWrap: true,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
 
                             // Terms & Conditions Checkbox
                             Row(

@@ -3,7 +3,8 @@ class RdvEntity {
   final int animalID;
   final String vet;
   final DateTime date;
-  final int isConfirmed; 
+  final int isConfirmed;
+  final int vetID;
 
   const RdvEntity({
     this.id,
@@ -11,11 +12,11 @@ class RdvEntity {
     required this.vet,
     required this.date,
     required this.isConfirmed,
+    required this.vetID,
   });
 
   @override
   String toString() {
-    return 'RdvEntity(id: $id, animalID: $animalID, vet: $vet, date: $date, isConfirmed: $isConfirmed)';
+    return 'RdvEntity(id: $id, animalID: $animalID, vet: $vet, date: $date, isConfirmed: $isConfirmed, vetID: $vetID)';
   }
-
 }

@@ -14,4 +14,10 @@ class UserEntity {
   });
 
   String get fullName => '${firstName ?? ''} ${lastName ?? ''}';
+
+
+  @override
+  String toString() {
+    return 'UserEntity(id: $id, firstName: $firstName, lastName: $lastName, email: $email, password: $password)';
+  }
 }

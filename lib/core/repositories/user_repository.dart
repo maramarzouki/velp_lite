@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:velp_lite/core/entities/user_entity.dart';
 import 'package:velp_lite/core/models/user_model.dart';
 import 'package:velp_lite/core/services/user_db_helper.dart';
@@ -6,10 +7,22 @@ class UserRepository {
   final UserDbHelper db;
   UserRepository({required this.db});
 
-  Future<UserEntity> createUser(UserEntity user) async {
+  Future<Map<String, dynamic>> createUser(UserEntity user) async {
     final userModel = UserModel.fromEntity(user);
     final createdUser = await db.createUser(userModel);
-    return createdUser.toEntity();
+
+    debugPrint('res from repository: $createdUser');
+    return {
+      'user': createdUser.toEntity(),
+      'message': 'User created successfully',
+    };
+  }
+
+  // login user
+  Future<UserEntity> loginUser(UserEntity userEntity) async {
+    final userModel = UserModel.fromEntity(userEntity);
+    final user = await db.loginUser(userModel.email, userModel.password);
+    return user.toEntity();
   }
 
   Future<List<UserEntity>> getUsers() async {
@@ -21,7 +34,7 @@ class UserRepository {
     final user = await db.getUser(id);
     return user.toEntity();
   }
-  
+
   Future<int> updateUser(UserEntity user) async {
     final userModel = UserModel.fromEntity(user);
     return await db.updateUser(userModel);

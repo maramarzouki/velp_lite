@@ -2,28 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:velp_lite/core/entities/pet_entity.dart';
 import 'package:velp_lite/core/entities/rdv_entity.dart';
+import 'package:velp_lite/core/entities/vet_entity.dart';
 import 'package:velp_lite/core/providers/rdv_providers.dart';
+import 'package:velp_lite/core/providers/vet_providers.dart';
 import 'package:velp_lite/core/theme/app_colors.dart';
-
-class Vet {
-  final String name;
-  final String specialty;
-  final String clinic;
-  final String rating;
-  final String distance;
-  final String emoji;
-  final List<String> availableTimes;
-
-  Vet({
-    required this.name,
-    required this.specialty,
-    required this.clinic,
-    required this.rating,
-    required this.distance,
-    required this.emoji,
-    required this.availableTimes,
-  });
-}
 
 class ScheduleVetScreen extends ConsumerStatefulWidget {
   final PetEntity pet;
@@ -35,47 +17,49 @@ class ScheduleVetScreen extends ConsumerStatefulWidget {
 
 class _ScheduleVetScreenState extends ConsumerState<ScheduleVetScreen> {
   DateTime? _selectedDate;
-  Vet? _selectedVet;
+  VetEntity? _selectedVet;
   String? _selectedTime;
 
-  final List<Vet> _vets = [
-    Vet(
-      name: 'Dr. Sarah Wilson',
-      specialty: 'General Veterinarian',
-      clinic: 'Happy Paws Clinic',
-      rating: '4.9',
-      distance: '2.3 km',
-      emoji: '👩‍⚕️',
-      availableTimes: ['09:00 AM', '10:30 AM', '02:00 PM', '04:30 PM'],
-    ),
-    Vet(
-      name: 'Dr. Michael Chen',
-      specialty: 'Surgery Specialist',
-      clinic: 'Pet Care Center',
-      rating: '4.8',
-      distance: '3.1 km',
-      emoji: '👨‍⚕️',
-      availableTimes: ['09:30 AM', '11:00 AM', '03:00 PM', '05:00 PM'],
-    ),
-    Vet(
-      name: 'Dr. Emily Rodriguez',
-      specialty: 'Dental Specialist',
-      clinic: 'Veterinary Hospital',
-      rating: '4.9',
-      distance: '1.8 km',
-      emoji: '👩‍⚕️',
-      availableTimes: ['10:00 AM', '01:00 PM', '03:30 PM', '05:30 PM'],
-    ),
-    Vet(
-      name: 'Dr. James Anderson',
-      specialty: 'Emergency Care',
-      clinic: 'Animal Emergency',
-      rating: '5.0',
-      distance: '4.2 km',
-      emoji: '👨‍⚕️',
-      availableTimes: ['08:00 AM', '12:00 PM', '04:00 PM', '06:00 PM'],
-    ),
-  ];
+  // final List<VetEntity> _vets = [];
+
+  // final List<Vet> _vets = [
+  //   Vet(
+  //     name: 'Dr. Sarah Wilson',
+  //     specialty: 'General Veterinarian',
+  //     clinic: 'Happy Paws Clinic',
+  //     rating: '4.9',
+  //     distance: '2.3 km',
+  //     emoji: '👩‍⚕️',
+  //     availableTimes: ['09:00 AM', '10:30 AM', '02:00 PM', '04:30 PM'],
+  //   ),
+  //   Vet(
+  //     name: 'Dr. Michael Chen',
+  //     specialty: 'Surgery Specialist',
+  //     clinic: 'Pet Care Center',
+  //     rating: '4.8',
+  //     distance: '3.1 km',
+  //     emoji: '👨‍⚕️',
+  //     availableTimes: ['09:30 AM', '11:00 AM', '03:00 PM', '05:00 PM'],
+  //   ),
+  //   Vet(
+  //     name: 'Dr. Emily Rodriguez',
+  //     specialty: 'Dental Specialist',
+  //     clinic: 'Veterinary Hospital',
+  //     rating: '4.9',
+  //     distance: '1.8 km',
+  //     emoji: '👩‍⚕️',
+  //     availableTimes: ['10:00 AM', '01:00 PM', '03:30 PM', '05:30 PM'],
+  //   ),
+  //   Vet(
+  //     name: 'Dr. James Anderson',
+  //     specialty: 'Emergency Care',
+  //     clinic: 'Animal Emergency',
+  //     rating: '5.0',
+  //     distance: '4.2 km',
+  //     emoji: '👨‍⚕️',
+  //     availableTimes: ['08:00 AM', '12:00 PM', '04:00 PM', '06:00 PM'],
+  //   ),
+  // ];
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -168,44 +152,49 @@ class _ScheduleVetScreenState extends ConsumerState<ScheduleVetScreen> {
         minute,
       ),
       isConfirmed: 1,
+      vetID: _selectedVet!.id!,
     );
+    debugPrint('rdv from schedule vet screen: $rdv');
 
-    try{
+    try {
       final createdRdv = await ref
-        .read(rdvViewModelProvider.notifier)
-        .addRdv(rdv);
-         Navigator.pop(context);
+          .read(rdvViewModelProvider.notifier)
+          .addRdv(rdv);
+      Navigator.pop(context);
 
-    // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle, color: AppColors.white),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                'Appointment scheduled with ${createdRdv.vet} on ${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year} at $_selectedTime',
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle, color: AppColors.white),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Appointment scheduled with ${createdRdv.vet} on ${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year} at $_selectedTime',
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
+          backgroundColor: AppColors.accent,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          duration: const Duration(seconds: 4),
         ),
-        backgroundColor: AppColors.accent,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        duration: const Duration(seconds: 4),
-      ),
-    );
-  
+      );
     } catch (e) {
       debugPrint('Error adding rdv: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error adding rdv: $e')),
-      );
-   }}
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error adding rdv: $e')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final vets = ref.watch(vetViewModelProvider);
     return Scaffold(
       body: Column(
         children: [
@@ -367,7 +356,7 @@ class _ScheduleVetScreenState extends ConsumerState<ScheduleVetScreen> {
                         ),
                       ],
                     ),
-                    child: DropdownButtonFormField<Vet>(
+                    child: DropdownButtonFormField<VetEntity>(
                       value: _selectedVet,
                       itemHeight: 64,
                       decoration: InputDecoration(
@@ -396,49 +385,102 @@ class _ScheduleVetScreenState extends ConsumerState<ScheduleVetScreen> {
                       isExpanded: true,
                       dropdownColor: AppColors.white,
                       borderRadius: BorderRadius.circular(16),
-                      items: _vets.map((Vet vet) {
-                        return DropdownMenuItem<Vet>(
-                          value: vet,
-                          child: Row(
-                            children: [
-                              Text(
-                                vet.emoji,
-                                style: const TextStyle(fontSize: 24),
+                      items: vets.when(
+                        data: (vets) {
+                          if (vets.isEmpty) {
+                            return [
+                              const DropdownMenuItem<VetEntity>(
+                                value: null,
+                                child: Text('No vets found'),
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      vet.name,
-                                      style: const TextStyle(
-                                        color: AppColors.text,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                            ];
+                          }
+                          return vets.map<DropdownMenuItem<VetEntity>>((vet) {
+                            return DropdownMenuItem<VetEntity>(
+                              value: vet,
+                              child: Row(
+                                children: [
+                                  Text(
+                                    vet.emoji,
+                                    style: const TextStyle(fontSize: 24),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          vet.name,
+                                          style: const TextStyle(
+                                            color: AppColors.text,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        // Add more vet details here if needed
+                                      ],
                                     ),
-                                    // Text(
-                                    //   '${vet.specialty} • ⭐${vet.rating}',
-                                    //   style: TextStyle(
-                                    //     color: AppColors.lightText,
-                                    //     fontSize: 12,
-                                    //   ),
-                                    // ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            );
+                          }).toList();
+                        },
+                        error: (error, stack) => [
+                          const DropdownMenuItem<VetEntity>(
+                            value: null,
+                            child: Text('Error loading vets'),
                           ),
-                        );
-                      }).toList(),
-                      onChanged: (Vet? newValue) {
-                        setState(() {
-                          _selectedVet = newValue;
-                          _selectedTime = null;
-                        });
-                      },
+                        ],
+                        loading: () => [
+                          const DropdownMenuItem<VetEntity>(
+                            value: null,
+                            child: Text('Loading...'),
+                          ),
+                        ],
+                      ),
+
+                      // _vets.map((Vet vet) {
+                      //   return DropdownMenuItem<Vet>(
+                      //     value: vet,
+                      //     child: Row(
+                      //       children: [
+                      //         Text(
+                      //           vet.emoji,
+                      //           style: const TextStyle(fontSize: 24),
+                      //         ),
+                      //         const SizedBox(width: 12),
+                      //         Expanded(
+                      //           child: Column(
+                      //             crossAxisAlignment: CrossAxisAlignment.start,
+                      //             mainAxisSize: MainAxisSize.min,
+                      //             children: [
+                      //               Text(
+                      //                 vet.name,
+                      //                 style: const TextStyle(
+                      //                   color: AppColors.text,
+                      //                   fontSize: 16,
+                      //                   fontWeight: FontWeight.w600,
+                      //                 ),
+                      //               ),
+                      //               // Text(
+                      //               //   '${vet.specialty} • ⭐${vet.rating}',
+                      //               //   style: TextStyle(
+                      //               //     color: AppColors.lightText,
+                      //               //     fontSize: 12,
+                      //               //   ),
+                      //               // ),
+                      //             ],
+                      //           ),
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   );
+                      // }).toList(),
+                      onChanged: (VetEntity? newValue) =>
+                          setState(() => _selectedVet = newValue),
                     ),
                   ),
                   const SizedBox(height: 20),

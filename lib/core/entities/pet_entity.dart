@@ -23,6 +23,31 @@ class PetEntity {
     required this.userID,
   });
 
+  PetEntity copyWith({
+    String? name,
+    String? species,
+    String? breed,
+    DateTime? birthDate,
+    String? gender,
+    double? weight,
+    String? color,
+    String? chipNumber,
+    int? userID,
+  }) {
+    return PetEntity(
+      id: id,
+      name: name ?? this.name,
+      species: species ?? this.species,
+      breed: breed ?? this.breed,
+      birthDate: birthDate ?? this.birthDate,
+      gender: gender ?? this.gender,
+      weight: weight ?? this.weight,
+      color: color ?? this.color,
+      chipNumber: chipNumber ?? this.chipNumber,
+      userID: userID ?? this.userID,
+    );
+  }
+
   /// computed age (years)
   int get ageYears {
     final today = DateTime.now();

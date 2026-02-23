@@ -36,7 +36,7 @@ class PetModel {
       'weight': weight,
       'color': color,
       'chip_number': chipNumber,
-      'user_id': userID,
+      'owner_id': userID,
     };
   }
 
@@ -51,7 +51,7 @@ class PetModel {
       weight: map['weight'].toDouble() ?? 0.0,
       color: map['color'],
       chipNumber: map['chip_number'] ?? '',
-      userID: map['user_id'],
+      userID: map['owner_id'],
     );
   }
 

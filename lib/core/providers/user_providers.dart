@@ -12,7 +12,8 @@ final userRepositoryProvider = Provider<UserRepository>(
   (ref) => UserRepository(db: ref.read(userDbHelperProvider)),
 );
 
-final userViewModelProvider =
-    AsyncNotifierProvider<UserViewModel, List<UserEntity>>(() {
-      return UserViewModel();
-    });
+final userViewModelProvider = AsyncNotifierProvider<UserViewModel, UserEntity>(
+  () {
+    return UserViewModel();
+  },
+);

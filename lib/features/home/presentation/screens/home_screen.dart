@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:velp_lite/core/providers/pet_providers.dart';
 import 'package:velp_lite/core/theme/app_colors.dart';
+import 'package:velp_lite/features/chat/presentation/screens/chat_lists_screen.dart';
 import 'package:velp_lite/features/home/presentation/screens/add_pet_screen.dart';
 import 'package:velp_lite/features/pet_details/presentation/screens/pet_details_screen.dart';
 
@@ -13,14 +14,29 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-
   final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(() {
+      final text = _searchController.text.trim();
+      if (text != _searchQuery) {
+        setState(() => _searchQuery = text);
+      }
+    });
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+    List<T> _filterList<T extends dynamic>(List<T> list, String query) {
+    // helper not used generically here, but kept for clarity
+    return list;
   }
 
   @override
@@ -75,33 +91,47 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             ),
                           ],
                         ),
+                        IconButton(
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ChatsListScreen(),
+                            ),
+                          ),
+                          icon: Icon(
+                            Icons.chat_bubble_rounded,
+                            color: AppColors.white,
+                            size: 24,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 16),
 
                     // search bar
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: TextField(
-                        controller: _searchController,
-                        decoration: InputDecoration(
-                          hintText: 'Search your pets...',
-                          prefixIcon: Icon(
-                            Icons.search,
-                            color: AppColors.accent,
-                            size: 20,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                        ),
-                      ),
-                    ),
+                    // Container(
+                    //   decoration: BoxDecoration(
+                    //     color: AppColors.white,
+                    //     borderRadius: BorderRadius.circular(16),
+                    //   ),
+                    //   child: TextField(
+                    //     controller: _searchController,
+                    //     decoration: InputDecoration(
+                    //       hintText: 'Search your pets...',
+                    //       prefixIcon: Icon(
+                    //         Icons.search,
+                    //         color: AppColors.accent,
+                    //         size: 20,
+                    //       ),
+                    //       border: InputBorder.none,
+                    //       contentPadding: const EdgeInsets.symmetric(
+                    //         horizontal: 16,
+                    //         vertical: 12,
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+                  
                   ],
                 ),
               ),
@@ -140,7 +170,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => PetDetailsScreen(pet: pet,),
+                                  builder: (_) => PetDetailsScreen(pet: pet),
                                 ),
                               );
                             },
@@ -158,8 +188,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
                                         colors: [
-                                          AppColors.accent.withValues(alpha: .3),
-                                          AppColors.accent.withValues(alpha: .1),
+                                          AppColors.accent.withValues(
+                                            alpha: .3,
+                                          ),
+                                          AppColors.accent.withValues(
+                                            alpha: .1,
+                                          ),
                                         ],
                                       ),
                                       borderRadius: BorderRadius.circular(16),
@@ -243,7 +277,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           color: Colors.transparent,
           child: InkWell(
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => AddPetScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => AddPetScreen()),
+              );
             },
             borderRadius: BorderRadius.circular(32),
             child: const Icon(Icons.add, color: AppColors.white, size: 28),

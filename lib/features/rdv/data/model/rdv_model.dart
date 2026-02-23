@@ -6,6 +6,7 @@ class RdvModel {
   String vet;
   DateTime date;
   int isConfirmed;
+  int vetID;
 
   RdvModel({
     this.id,
@@ -13,6 +14,7 @@ class RdvModel {
     required this.vet,
     required this.date,
     required this.isConfirmed,
+    required this.vetID,
   });
 
   Map<String, dynamic> toMap() {
@@ -22,7 +24,8 @@ class RdvModel {
       'vet': vet,
       'date': date.toIso8601String(),
       'is_confirmed': isConfirmed,
-    };
+      'vet_id': vetID,
+      };
   }
 
   factory RdvModel.fromMap(Map<String, dynamic> map) {
@@ -32,6 +35,7 @@ class RdvModel {
       vet: map['vet'],
       date: DateTime.parse(map['date'] as String),
       isConfirmed: map['is_confirmed'],
+      vetID: map['vet_id'],
     );
   }
 
@@ -42,6 +46,7 @@ class RdvModel {
       vet: vet,
       date: date,
       isConfirmed: isConfirmed,
+      vetID: vetID,
     );
   }
 
@@ -52,6 +57,7 @@ class RdvModel {
       vet: entity.vet,
       date: entity.date,
       isConfirmed: entity.isConfirmed,
+      vetID: entity.vetID,
     );
   }
 }

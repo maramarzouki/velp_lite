@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:velp_lite/core/entities/pet_entity.dart';
 import 'package:velp_lite/core/entities/rdv_entity.dart';
+import 'package:velp_lite/core/providers/pet_providers.dart';
 import 'package:velp_lite/core/providers/rdv_providers.dart';
 import 'package:velp_lite/core/theme/app_colors.dart';
+import 'package:velp_lite/features/pet_details/presentation/screens/update_details_screen.dart';
 import 'package:velp_lite/features/rdv/presentation/screens/schedule_vet_screen.dart';
 
 class PetDetailsScreen extends ConsumerStatefulWidget {
@@ -20,6 +22,8 @@ class _PetDetailsScreenState extends ConsumerState<PetDetailsScreen>
   late TabController _tabController;
   int _currentTabIndex = 0;
 
+  late PetEntity _pet;
+
   @override
   void initState() {
     super.initState();
@@ -29,6 +33,7 @@ class _PetDetailsScreenState extends ConsumerState<PetDetailsScreen>
         _currentTabIndex = _tabController.index;
       });
     });
+    _pet = widget.pet;
   }
 
   @override
@@ -39,20 +44,10 @@ class _PetDetailsScreenState extends ConsumerState<PetDetailsScreen>
 
   @override
   Widget build(BuildContext context) {
-    // In a real app, you'd get this from arguments
-    // final pet = {
-    //   'name': 'Luna',
-    //   'breed': 'Golden Retriever',
-    //   'age': '3 years',
-    //   'weight': '28 kg',
-    //   'gender': 'Female',
-    //   'emoji': '🐕',
-    // };
-
     final rdvVMProvider = ref.watch(rdvViewModelProvider);
 
     final List<RdvEntity> appointments = rdvVMProvider.when(
-      data: (data) => data.where((r) => r.animalID == widget.pet.id).toList(),
+      data: (data) => data.where((r) => r.animalID == _pet.id).toList(),
       error: (error, stackTrace) => [],
       loading: () => [],
     );
@@ -168,14 +163,14 @@ class _PetDetailsScreenState extends ConsumerState<PetDetailsScreen>
                                   ),
                                   child: Center(
                                     child: Text(
-                                      widget.pet.emoji,
+                                      _pet.emoji,
                                       style: const TextStyle(fontSize: 100),
                                     ),
                                   ),
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
-                                  widget.pet.name,
+                                  _pet.name,
                                   style: const TextStyle(
                                     color: AppColors.text,
                                     fontSize: 28,
@@ -184,7 +179,7 @@ class _PetDetailsScreenState extends ConsumerState<PetDetailsScreen>
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  widget.pet.breed,
+                                  _pet.breed,
                                   style: TextStyle(
                                     color: AppColors.lightText,
                                     fontSize: 16,
@@ -207,25 +202,23 @@ class _PetDetailsScreenState extends ConsumerState<PetDetailsScreen>
                             Expanded(
                               child: _buildStatCard(
                                 emoji: '⏱️',
-                                value: widget.pet.ageLabel.toString(),
-                                label: 'Years',
+                                value: _pet.ageLabel.toString(),
+                                label: '',
                               ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: _buildStatCard(
                                 emoji: '⚖️',
-                                value: widget.pet.weight.toString(),
+                                value: _pet.weight.toString(),
                                 label: 'Kg',
                               ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: _buildStatCard(
-                                emoji: widget.pet.gender == 'Female'
-                                    ? '♀️'
-                                    : '♂️',
-                                value: widget.pet.gender,
+                                emoji: _pet.gender == 'Female' ? '♀️' : '♂️',
+                                value: _pet.gender,
                                 label: 'Gender',
                               ),
                             ),
@@ -244,8 +237,6 @@ class _PetDetailsScreenState extends ConsumerState<PetDetailsScreen>
                             _buildTabButton('Info', 0),
                             const SizedBox(width: 8),
                             _buildTabButton('Medical', 1),
-                            const SizedBox(width: 8),
-                            _buildTabButton('Photos', 2),
                           ],
                         ),
                       ),
@@ -258,7 +249,7 @@ class _PetDetailsScreenState extends ConsumerState<PetDetailsScreen>
                         padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                         child: _buildTabContent(
                           _currentTabIndex,
-                          widget.pet,
+                          _pet,
                           appointments,
                         ),
                       ),
@@ -279,7 +270,7 @@ class _PetDetailsScreenState extends ConsumerState<PetDetailsScreen>
                                   context,
                                   MaterialPageRoute(
                                     builder: (_) =>
-                                        ScheduleVetScreen(pet: widget.pet),
+                                        ScheduleVetScreen(pet: _pet),
                                   ),
                                 );
                               },
@@ -291,7 +282,18 @@ class _PetDetailsScreenState extends ConsumerState<PetDetailsScreen>
                               label: 'Edit Profile',
                               icon: Icons.edit_outlined,
                               color: AppColors.secondary,
-                              onPressed: () {},
+                              onPressed: () async {
+                                final updated = await Navigator.push<PetEntity>(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => UpdatePetScreen(pet: _pet),
+                                  ),
+                                );
+                                if (updated != null) {
+                                  setState(() => _pet = updated);
+                                  ref.refresh(petViewModelProvider);
+                                }
+                              },
                             ),
                           ),
                         ],
@@ -413,7 +415,7 @@ class _PetDetailsScreenState extends ConsumerState<PetDetailsScreen>
           accentColor: AppColors.accent,
           children: [
             _buildInfoRow(
-              emoji: '🐕',
+              emoji: pet.emoji,
               label: 'Breed',
               value: pet.breed,
               color: AppColors.accent,
@@ -449,6 +451,8 @@ class _PetDetailsScreenState extends ConsumerState<PetDetailsScreen>
   }
 
   Widget _buildMedicalTab(PetEntity pet, List<RdvEntity> appointments) {
+    final sorted = List<RdvEntity>.from(appointments)
+      ..sort((a, b) => a.date.compareTo(b.date));
     return Column(
       children: [
         _buildInfoCard(
@@ -469,10 +473,10 @@ class _PetDetailsScreenState extends ConsumerState<PetDetailsScreen>
               ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: appointments.length,
+                itemCount: sorted.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
-                  final appointment = appointments[index];
+                  final appointment = sorted[index];
                   return _buildAppointmentCard(appointment);
                 },
               ),
@@ -493,7 +497,6 @@ class _PetDetailsScreenState extends ConsumerState<PetDetailsScreen>
         //     );
         //   },
         // ),
-      
       ],
     );
     // return _buildInfoCard(
@@ -759,7 +762,10 @@ Widget _buildAppointmentCard(RdvEntity appt) {
                   children: [
                     Text(
                       DateFormat.Hm().format(appt.date),
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                      ),
                     ),
                     const Spacer(),
                     // _buildStatusChip(appt.status),

@@ -7,15 +7,17 @@ import 'package:velp_lite/core/providers/pet_providers.dart';
 import 'package:velp_lite/core/theme/app_colors.dart';
 import 'package:velp_lite/core/validators/validators.dart';
 
-class AddPetScreen extends ConsumerStatefulWidget {
-  const AddPetScreen({super.key});
+class UpdatePetScreen extends ConsumerStatefulWidget {
+  final PetEntity pet;
+
+  const UpdatePetScreen({super.key, required this.pet});
 
   @override
-  ConsumerState<AddPetScreen> createState() => _AddPetScreenState();
+  ConsumerState<UpdatePetScreen> createState() => _UpdatePetScreenState();
 }
 
-class _AddPetScreenState extends ConsumerState<AddPetScreen> {
-  final _addPetFormKey = GlobalKey<FormState>();
+class _UpdatePetScreenState extends ConsumerState<UpdatePetScreen> {
+  final _updatePetFormKey = GlobalKey<FormState>();
 
   // Form fields
   final TextEditingController _nameController = TextEditingController();
@@ -31,13 +33,21 @@ class _AddPetScreenState extends ConsumerState<AddPetScreen> {
 
   final List<String> _species = ['Dog', 'Cat', 'Bird', 'Rabbit', 'Other'];
   final List<String> _genders = ['Male', 'Female'];
-  // final Map<String, String> _speciesEmojis = {
-  //   'Dog': '🐕',
-  //   'Cat': '🐱',
-  //   'Bird': '🦜',
-  //   'Rabbit': '🐰',
-  //   'Other': '🐾',
-  // };
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-populate fields with existing pet data
+    _nameController.text = widget.pet.name;
+    _breedController.text = widget.pet.breed;
+    _weightController.text = widget.pet.weight.toString();
+    _colorController.text = widget.pet.color;
+    _chipNumberController.text = widget.pet.chipNumber;
+    _selectedSpecies = widget.pet.species;
+    _selectedGender = widget.pet.gender;
+    _birthDate = widget.pet.birthDate;
+    // Optionally set _selectedEmoji based on species or other logic
+  }
 
   @override
   void dispose() {
@@ -75,12 +85,12 @@ class _AddPetScreenState extends ConsumerState<AddPetScreen> {
     }
   }
 
-  Future<void> _savePet() async {
+  Future<void> _updatePet() async {
     final prefs = await SharedPreferences.getInstance();
     final userID = prefs.getInt('user_id');
-    debugPrint('userID from add pet screen: $userID');
-    if (_addPetFormKey.currentState!.validate()) {
-      PetEntity petEntity = PetEntity(
+    debugPrint('userID from update pet screen: $userID');
+    if (_updatePetFormKey.currentState!.validate()) {
+      PetEntity updatedPet = widget.pet.copyWith(
         name: _nameController.text,
         species: _selectedSpecies!,
         breed: _breedController.text,
@@ -92,13 +102,12 @@ class _AddPetScreenState extends ConsumerState<AddPetScreen> {
         userID: userID!,
       );
 
-      ref.read(petViewModelProvider.notifier).addPet(petEntity);
+      ref.read(petViewModelProvider.notifier).updatePet(updatedPet);
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Pet added successfully')));
+      ).showSnackBar(const SnackBar(content: Text('Pet updated successfully')));
 
-      _addPetFormKey.currentState!.reset();
-      // Navigator.pop(context);
+      Navigator.pop(context, updatedPet	);
     }
   }
 
@@ -148,7 +157,7 @@ class _AddPetScreenState extends ConsumerState<AddPetScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Add New Pet',
+                            'Update Pet',
                             style: TextStyle(
                               color: AppColors.white,
                               fontSize: 24,
@@ -157,7 +166,7 @@ class _AddPetScreenState extends ConsumerState<AddPetScreen> {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            'Fill in your pet\'s information',
+                            'Update your pet\'s information',
                             style: TextStyle(
                               color: AppColors.white,
                               fontSize: 14,
@@ -175,7 +184,7 @@ class _AddPetScreenState extends ConsumerState<AddPetScreen> {
             // Form
             Expanded(
               child: Form(
-                key: _addPetFormKey,
+                key: _updatePetFormKey,
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(20),
                   child: Column(
@@ -377,12 +386,12 @@ class _AddPetScreenState extends ConsumerState<AddPetScreen> {
                       ),
                       const SizedBox(height: 32),
 
-                      // Save Button
+                      // Update Button
                       SizedBox(
                         width: double.infinity,
                         height: 56,
                         child: ElevatedButton(
-                          onPressed: () => _savePet(),
+                          onPressed: () => _updatePet(),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             foregroundColor: AppColors.white,
@@ -400,7 +409,7 @@ class _AddPetScreenState extends ConsumerState<AddPetScreen> {
                               Icon(Icons.check_circle_outline, size: 24),
                               SizedBox(width: 12),
                               Text(
-                                'Add Pet',
+                                'Update Pet',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
@@ -445,7 +454,7 @@ class _AddPetScreenState extends ConsumerState<AddPetScreen> {
       controller: controller,
       keyboardType: keyboardType,
       inputFormatters: inputFormatters,
-      validator: Validators().defaultValidation,
+      validator: validator ?? Validators().defaultValidation,
       decoration: InputDecoration(
         hintText: hintText,
         prefixIcon: Icon(icon, color: AppColors.accent, size: 20),

@@ -14,14 +14,19 @@ class MessageRepository {
     return createdMessage.toEntity();
   }
 
-  Future<List<MessageEntity>> getMessages() async {
-    final messages = await db.getMessages();
+  Future<List<MessageEntity>> getMessages(int roomId) async {
+    final messages = await db.getMessages(roomId);
     return messages.map((e) => e.toEntity()).toList();
   }
 
   Future<MessageEntity> getMessage(int id) async {
     final message = await db.getMessage(id);
     return message.toEntity();
+  }
+
+  Future<MessageEntity> getLastMessage(int roomId, int msgID) async {
+    final lastMessage = await db.getLastMessage(roomId, msgID);
+    return lastMessage.toEntity();
   }
 
   Future<int> updateMessage(MessageEntity message) async {

@@ -3,6 +3,7 @@ import 'package:velp_lite/core/entities/message_entity.dart';
 class MessageModel {
   int? id;
   int sender;
+  String senderType;
   String content;
   DateTime timestamp;
   int roomId;
@@ -11,6 +12,7 @@ class MessageModel {
   MessageModel({
     this.id,
     required this.sender,
+    required this.senderType,
     required this.content,
     required this.timestamp,
     required this.roomId,
@@ -20,9 +22,10 @@ class MessageModel {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'sender': sender,
+      'sender_id': sender,
+      'sender_type': senderType,
       'content': content,
-      'timestamp': timestamp,
+      'timestamp': timestamp.toIso8601String(),
       'room_id': roomId,
       'content_type': contentType,
     };
@@ -31,7 +34,8 @@ class MessageModel {
   factory MessageModel.fromMap(Map<String, dynamic> map) {
     return MessageModel(
       id: map['id'],
-      sender: map['sender'],
+      sender: map['sender_id'],
+      senderType: map['sender_type'],
       content: map['content'],
       timestamp: DateTime.parse(map['timestamp']),
       roomId: map['room_id'],
@@ -43,6 +47,7 @@ class MessageModel {
     return MessageEntity(
       id: id,
       sender: sender,
+      senderType: senderType,
       content: content,
       timestamp: timestamp,
       roomId: roomId,
@@ -54,6 +59,7 @@ class MessageModel {
     return MessageModel(
       id: entity.id,
       sender: entity.sender,
+      senderType: entity.senderType,
       content: entity.content,
       timestamp: entity.timestamp,
       roomId: entity.roomId,

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:velp_lite/features/auth/presentation/screens/register_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized(); 
   runApp(ProviderScope(child: MyApp()));
 }
 
