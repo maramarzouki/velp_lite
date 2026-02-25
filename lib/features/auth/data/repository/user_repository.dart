@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:velp_lite/core/entities/user_entity.dart';
-import 'package:velp_lite/core/models/user_model.dart';
+import 'package:velp_lite/features/auth/data/entity/user_entity.dart';
+import 'package:velp_lite/features/auth/data/model/user_model.dart';
 import 'package:velp_lite/core/services/user_db_helper.dart';
 
 class UserRepository {

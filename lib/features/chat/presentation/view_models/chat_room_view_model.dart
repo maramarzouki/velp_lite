@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:velp_lite/core/entities/chat_room_entity.dart';
+import 'package:velp_lite/features/chat/data/entity/chat_room_entity.dart';
 import 'package:velp_lite/core/providers/chat_room_providers.dart';
-import 'package:velp_lite/core/repositories/chat_room_repository.dart';
+import 'package:velp_lite/features/chat/data/repository/chat_room_repository.dart';
 
 class ChatRoomViewModel extends AsyncNotifier<List<ChatRoomEntity>> {
   // late final ChatRoomRepository _repo;

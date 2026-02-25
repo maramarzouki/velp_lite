@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:velp_lite/core/entities/user_entity.dart';
+import 'package:velp_lite/features/auth/data/entity/user_entity.dart';
 import 'package:velp_lite/core/theme/app_colors.dart';
 import 'package:velp_lite/core/providers/user_providers.dart';
 import 'package:velp_lite/features/auth/presentation/screens/login_screen.dart';
@@ -52,7 +52,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             .createUser(userEntity);
         debugPrint('user from register screen: $user');
         if (user['user'] != null) {
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (_) => LoginScreen()),
           );
@@ -72,7 +72,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       } catch (e) {
         debugPrint('error from register screen: $e');
         setState(() {
-          errorMessage = 'Server error: An error occurred during registration. Please try again.';
+          errorMessage =
+              'Server error: An error occurred during registration. Please try again.';
         });
       }
     }
@@ -131,7 +132,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Join PetCare family today',
+                        'Join Velp family today',
                         style: TextStyle(
                           color: AppColors.lightText,
                           fontSize: 15,
@@ -178,6 +179,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             ),
                             const SizedBox(height: 8),
                             TextFormField(
+                              textCapitalization: TextCapitalization.words,
                               controller: _firstNameController,
                               keyboardType: TextInputType.name,
                               decoration: InputDecoration(
@@ -246,6 +248,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             ),
                             const SizedBox(height: 8),
                             TextFormField(
+                              textCapitalization: TextCapitalization.words,
                               controller: _lastNameController,
                               keyboardType: TextInputType.name,
                               decoration: InputDecoration(

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:velp_lite/core/entities/chat_room_entity.dart';
-import 'package:velp_lite/core/entities/message_entity.dart';
+import 'package:velp_lite/features/chat/data/entity/chat_room_entity.dart';
+import 'package:velp_lite/features/chat/data/entity/message_entity.dart';
 import 'package:velp_lite/core/entities/vet_entity.dart';
 import 'package:velp_lite/core/providers/chat_room_providers.dart';
 import 'package:velp_lite/core/providers/message_providers.dart';
@@ -114,97 +114,100 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   Future<void> _sendMessage(String content) async {
     if (content.trim().isEmpty) return;
-  try {
-    final user = ref.read(userViewModelProvider);
-    int roomId;
-    if (widget.roomID != null) {
-      roomId = widget.roomID!;
-    } else {
-      // Always create for new chats
-      final createdChatRoom = await createChatRoom(widget.vet, 0);
-      if (createdChatRoom == null || createdChatRoom.id == null) {
-        setState(() => errorMessage = 'Failed to create chat room');
-        return;
+    try {
+      final user = ref.read(userViewModelProvider);
+
+      int roomId;
+      if (widget.roomID != null) {
+        roomId = widget.roomID!;
+      } else if (newRoomID != 0) {
+        roomId = newRoomID;
+      } else {
+        // for new chats
+        final createdChatRoom = await createChatRoom(widget.vet, 0);
+        if (createdChatRoom == null || createdChatRoom.id == null) {
+          setState(() => errorMessage = 'Failed to create chat room');
+          return;
+        }
+        roomId = createdChatRoom.id!;
+        setState(() => newRoomID = roomId);
       }
-      roomId = createdChatRoom.id!;
-      setState(() => newRoomID = roomId);
-    }
 
-    final message = MessageEntity(
-      sender: user.value!.id!,
-      senderType: 'user',
-      content: content,
-      timestamp: DateTime.now(),
-      roomId: roomId,
-      contentType: 'text',
-    );
-    final newMsg = await ref
-        .read(messageViewModelProvider(roomId).notifier)
-        .addMessage(message);
+      final message = MessageEntity(
+        sender: user.value!.id!,
+        senderType: 'user',
+        content: content,
+        timestamp: DateTime.now(),
+        roomId: roomId,
+        contentType: 'text',
+      );
+      final newMsg = await ref
+          .read(messageViewModelProvider(roomId).notifier)
+          .addMessage(message);
 
-    if (newMsg.id != null) {
-      await ref
-          .read(chatRoomViewModelProvider(user.value!.id!).notifier)
-          .updateChatRoomLastMessageId(roomId, newMsg.id!);
-    }
+      if (newMsg.id != null) {
+        await ref
+            .read(chatRoomViewModelProvider(user.value!.id!).notifier)
+            .updateChatRoomLastMessageId(roomId, newMsg.id!);
+      }
 
-    _messageController.clear();
-    // if (content.trim().isEmpty) return;
-    // try {
-    //   debugPrint('contenttttt $content');
-    //   final user = ref.read(userViewModelProvider);
-    //   final chatRoomsAsync = ref.read(
-    //     chatRoomViewModelProvider(user.value!.id!),
-    //   );
-    //   // final roomID = chatRooms.value!.last.id!;
+      _messageController.clear();
+      // if (content.trim().isEmpty) return;
+      // try {
+      //   debugPrint('contenttttt $content');
+      //   final user = ref.read(userViewModelProvider);
+      //   final chatRoomsAsync = ref.read(
+      //     chatRoomViewModelProvider(user.value!.id!),
+      //   );
+      //   // final roomID = chatRooms.value!.last.id!;
 
-    //   int? existingRoomId;
-    //   if (chatRoomsAsync.hasValue && chatRoomsAsync.value!.isNotEmpty) {
-    //     existingRoomId = chatRoomsAsync.value!.last.id;
-    //   }
+      //   int? existingRoomId;
+      //   if (chatRoomsAsync.hasValue && chatRoomsAsync.value!.isNotEmpty) {
+      //     existingRoomId = chatRoomsAsync.value!.last.id;
+      //   }
 
-    //   int roomId;
-    //   if (chatRoomsAsync.value!.isEmpty) {
-    //     final createdChatRoom = await createChatRoom(widget.vet, 0);
-    //     if (createdChatRoom == null || createdChatRoom.id == null) {
-    //       setState(() {
-    //         setState(() => errorMessage = 'Failed to create chat room');
-    //         return;
-    //       });
-    //     }
-    //     roomId = createdChatRoom!.id!;
-    //     setState(() => newRoomID = roomId);
-    //   } else {
-    //     roomId = widget.roomID ?? existingRoomId ?? 0;
-    //     if (roomId == 0) {
-    //       setState(
-    //         () => errorMessage = 'No chat room available to send message',
-    //       );
-    //       return;
-    //     }
-    //   }
+      //   int roomId;
+      //   if (chatRoomsAsync.value!.isEmpty) {
+      //     final createdChatRoom = await createChatRoom(widget.vet, 0);
+      //     if (createdChatRoom == null || createdChatRoom.id == null) {
+      //       setState(() {
+      //         setState(() => errorMessage = 'Failed to create chat room');
+      //         return;
+      //       });
+      //     }
+      //     roomId = createdChatRoom!.id!;
+      //     setState(() => newRoomID = roomId);
+      //   } else {
+      //     roomId = widget.roomID ?? existingRoomId ?? 0;
+      //     if (roomId == 0) {
+      //       setState(
+      //         () => errorMessage = 'No chat room available to send message',
+      //       );
+      //       return;
+      //     }
+      //   }
 
-    //   final message = MessageEntity(
-    //     sender: user.value!.id!,
-    //     senderType: 'user',
-    //     content: content,
-    //     timestamp: DateTime.now(),
-    //     roomId: roomId,
-    //     contentType: 'text',
-    //   );
-    //   final newMsg = await ref
-    //       .read(messageViewModelProvider((roomId)).notifier)
-    //       .addMessage(message);
+      //   final message = MessageEntity(
+      //     sender: user.value!.id!,
+      //     senderType: 'user',
+      //     content: content,
+      //     timestamp: DateTime.now(),
+      //     roomId: roomId,
+      //     contentType: 'text',
+      //   );
+      //   final newMsg = await ref
+      //       .read(messageViewModelProvider((roomId)).notifier)
+      //       .addMessage(message);
 
-    //   debugPrint('newMsg from out if: $newMsg');
+      //   debugPrint('newMsg from out if: $newMsg');
 
-    //   if (newMsg.id != null) {
-    //     await ref
-    //         .read(chatRoomViewModelProvider(user.value!.id!).notifier)
-    //         .updateChatRoomLastMessageId(roomId, newMsg.id!);
-    //   }
+      //   if (newMsg.id != null) {
+      //     await ref
+      //         .read(chatRoomViewModelProvider(user.value!.id!).notifier)
+      //         .updateChatRoomLastMessageId(roomId, newMsg.id!);
+      //   }
 
-    //   _messageController.clear();
+      //   _messageController.clear();
       if (_scrollController.hasClients) {
         // small delay to allow ListView to rebuild with new message
         Future.delayed(const Duration(milliseconds: 50), () {
@@ -356,19 +359,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     ),
 
                     // More Options
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.white.withValues(alpha: .2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.more_vert,
-                          color: AppColors.white,
-                        ),
-                      ),
-                    ),
+                    // Container(
+                    //   decoration: BoxDecoration(
+                    //     color: AppColors.white.withValues(alpha: .2),
+                    //     borderRadius: BorderRadius.circular(12),
+                    //   ),
+                    //   child: IconButton(
+                    //     onPressed: () {},
+                    //     icon: const Icon(
+                    //       Icons.more_vert,
+                    //       color: AppColors.white,
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),

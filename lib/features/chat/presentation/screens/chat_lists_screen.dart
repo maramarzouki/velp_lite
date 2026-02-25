@@ -17,7 +17,6 @@ class ChatsListScreen extends ConsumerStatefulWidget {
 }
 
 class _ChatsListScreenState extends ConsumerState<ChatsListScreen> {
-
   void _showNewChatDialog() {
     final vets = ref.watch(vetViewModelProvider);
     final userId = ref.watch(userViewModelProvider).value!.id;
@@ -127,7 +126,11 @@ class _ChatsListScreenState extends ConsumerState<ChatsListScreen> {
                                         userId!,
                                       ).notifier,
                                     )
-                                    .getChatRoomByReceiver(userId, vet.id!, 'vet');
+                                    .getChatRoomByReceiver(
+                                      userId,
+                                      vet.id!,
+                                      'vet',
+                                    );
                                 if (chatRoom != null) {
                                   Navigator.pop(context);
                                   Navigator.push(
@@ -297,7 +300,6 @@ class _ChatsListScreenState extends ConsumerState<ChatsListScreen> {
   Widget build(BuildContext context) {
     final userId = ref.watch(userViewModelProvider).value!.id;
     final chatRooms = ref.watch(chatRoomViewModelProvider(userId!));
-    debugPrint('chatRooms in chat lists screen: ${chatRooms.value}');
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -322,40 +324,62 @@ class _ChatsListScreenState extends ConsumerState<ChatsListScreen> {
                   children: [
                     // Header Row
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Messages',
-                              style: TextStyle(
-                                color: AppColors.white,
-                                fontSize: 26,
-                                fontWeight: FontWeight.w700,
-                              ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.white.withValues(alpha: .2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(
+                              Icons.arrow_back,
+                              color: AppColors.white,
                             ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Chat with vets and clinics',
-                              style: TextStyle(
-                                color: AppColors.white,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                        IconButton(
-                          onPressed: _showNewChatDialog,
-                          icon: const Icon(
-                            Icons.edit_outlined,
-                            color: AppColors.white,
-                            size: 24,
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Back Button
+                              const Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Messages',
+                                    style: TextStyle(
+                                      color: AppColors.white,
+                                      fontSize: 26,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Chat with vets',
+                                    style: TextStyle(
+                                      color: AppColors.white,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              IconButton(
+                                onPressed: _showNewChatDialog,
+                                icon: const Icon(
+                                  Icons.edit_outlined,
+                                  color: AppColors.white,
+                                  size: 24,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    // const SizedBox(height: 16),
 
                     // Search Bar
                     // Container(
@@ -380,8 +404,6 @@ class _ChatsListScreenState extends ConsumerState<ChatsListScreen> {
                     //     ),
                     //   ),
                     // ),
-                  
-                  
                   ],
                 ),
               ),
@@ -390,16 +412,16 @@ class _ChatsListScreenState extends ConsumerState<ChatsListScreen> {
             // Chats List
             Expanded(
               child: chatRooms.when(
-                data: (chatRoom) {
-                  if (chatRoom.isEmpty) {
+                data: (rooms) {
+                  if (rooms.isEmpty) {
                     return const Center(child: Text('No chat rooms found!'));
                   }
                   return ListView.builder(
                     padding: const EdgeInsets.fromLTRB(20, 20, 20, 90),
-                    itemCount: chatRoom.length,
+                    itemCount: rooms.length,
 
                     itemBuilder: (context, index) {
-                      final chat = chatRoom[index];
+                      final chat = rooms[index];
 
                       // watch the last message for this chat
                       final lastMessageAsync = ref.watch(
@@ -433,15 +455,6 @@ class _ChatsListScreenState extends ConsumerState<ChatsListScreen> {
                       return lastMessageAsync.when(
                         data: (lastMessage) {
                           // defend against lastMessage being null
-                          if (lastMessage == null) {
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 12),
-                              padding: const EdgeInsets.all(16),
-                              child: Text('No last message'),
-                            );
-                          }
-
-                          // handle vet async states inside the last message data handler
                           return vetsAsyncValue.when(
                             data: (vets) {
                               final VetEntity vet = vets.firstWhere(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:velp_lite/core/entities/pet_entity.dart';
+import 'package:velp_lite/features/home/data/entity/pet_entity.dart';
 import 'package:velp_lite/core/providers/pet_providers.dart';
 import 'package:velp_lite/core/theme/app_colors.dart';
 import 'package:velp_lite/core/validators/validators.dart';
@@ -29,7 +29,6 @@ class _UpdatePetScreenState extends ConsumerState<UpdatePetScreen> {
   String? _selectedSpecies;
   String? _selectedGender;
   DateTime? _birthDate;
-  String _selectedEmoji = '🐕';
 
   final List<String> _species = ['Dog', 'Cat', 'Bird', 'Rabbit', 'Other'];
   final List<String> _genders = ['Male', 'Female'];
@@ -37,7 +36,6 @@ class _UpdatePetScreenState extends ConsumerState<UpdatePetScreen> {
   @override
   void initState() {
     super.initState();
-    // Pre-populate fields with existing pet data
     _nameController.text = widget.pet.name;
     _breedController.text = widget.pet.breed;
     _weightController.text = widget.pet.weight.toString();
@@ -46,7 +44,6 @@ class _UpdatePetScreenState extends ConsumerState<UpdatePetScreen> {
     _selectedSpecies = widget.pet.species;
     _selectedGender = widget.pet.gender;
     _birthDate = widget.pet.birthDate;
-    // Optionally set _selectedEmoji based on species or other logic
   }
 
   @override
@@ -102,7 +99,7 @@ class _UpdatePetScreenState extends ConsumerState<UpdatePetScreen> {
         userID: userID!,
       );
 
-      ref.read(petViewModelProvider.notifier).updatePet(updatedPet);
+      ref.read(petViewModelProvider(userID).notifier).updatePet(updatedPet);
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Pet updated successfully')));
@@ -190,43 +187,6 @@ class _UpdatePetScreenState extends ConsumerState<UpdatePetScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Pet Avatar Selection
-                      Center(
-                        child: Container(
-                          width: 120,
-                          height: 120,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                AppColors.accent.withValues(alpha: .3),
-                                AppColors.accent.withValues(alpha: .1),
-                              ],
-                            ),
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: AppColors.accent,
-                              width: 3,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.accent.withValues(alpha: .3),
-                                blurRadius: 16,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Text(
-                              _selectedEmoji,
-                              style: const TextStyle(fontSize: 70),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-
                       // Name Field
                       _buildSectionLabel('Pet Name *'),
                       const SizedBox(height: 8),

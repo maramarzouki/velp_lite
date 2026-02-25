@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:velp_lite/core/entities/pet_entity.dart';
-import 'package:velp_lite/core/entities/rdv_entity.dart';
+import 'package:velp_lite/features/home/data/entity/pet_entity.dart';
+import 'package:velp_lite/features/rdv/data/entity/rdv_entity.dart';
 import 'package:velp_lite/core/entities/vet_entity.dart';
-import 'package:velp_lite/core/providers/rdv_providers.dart';
+import 'package:velp_lite/features/rdv/presentation/view_models/rdv_providers.dart';
 import 'package:velp_lite/core/providers/vet_providers.dart';
 import 'package:velp_lite/core/theme/app_colors.dart';
 
@@ -158,32 +158,32 @@ class _ScheduleVetScreenState extends ConsumerState<ScheduleVetScreen> {
 
     try {
       final createdRdv = await ref
-          .read(rdvViewModelProvider.notifier)
+          .read(rdvViewModelProvider(widget.pet.id!).notifier)
           .addRdv(rdv);
-      Navigator.pop(context);
+      Navigator.pop(context, createdRdv);
 
       // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.check_circle, color: AppColors.white),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Appointment scheduled with ${createdRdv.vet} on ${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year} at $_selectedTime',
-                ),
-              ),
-            ],
-          ),
-          backgroundColor: AppColors.accent,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          duration: const Duration(seconds: 4),
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Row(
+      //       children: [
+      //         const Icon(Icons.check_circle, color: AppColors.white),
+      //         const SizedBox(width: 12),
+      //         Expanded(
+      //           child: Text(
+      //             'Appointment scheduled with ${createdRdv.vet} on ${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year} at $_selectedTime',
+      //           ),
+      //         ),
+      //       ],
+      //     ),
+      //     backgroundColor: AppColors.accent,
+      //     behavior: SnackBarBehavior.floating,
+      //     shape: RoundedRectangleBorder(
+      //       borderRadius: BorderRadius.circular(12),
+      //     ),
+      //     duration: const Duration(seconds: 4),
+      //   ),
+      // );
     } catch (e) {
       debugPrint('Error adding rdv: $e');
       ScaffoldMessenger.of(
@@ -236,12 +236,12 @@ class _ScheduleVetScreenState extends ConsumerState<ScheduleVetScreen> {
                       ),
                     ),
                     const SizedBox(width: 16),
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Schedule Vet Visit',
+                            'Schedule Vet Visit For ${widget.pet.name}',
                             style: TextStyle(
                               color: AppColors.white,
                               fontSize: 24,
@@ -272,67 +272,6 @@ class _ScheduleVetScreenState extends ConsumerState<ScheduleVetScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Date Picker
-                  const Text(
-                    'Select Date',
-                    style: TextStyle(
-                      color: AppColors.text,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  GestureDetector(
-                    onTap: () => _selectDate(context),
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: AppColors.background,
-                          width: 2,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: .06),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.calendar_today_outlined,
-                            color: AppColors.accent,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              _selectedDate == null
-                                  ? 'Select appointment date'
-                                  : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
-                              style: TextStyle(
-                                color: _selectedDate == null
-                                    ? AppColors.lightText
-                                    : AppColors.text,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                          Icon(
-                            Icons.arrow_forward_ios,
-                            color: AppColors.lightText,
-                            size: 16,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
                   // Veterinarian Dropdown
                   const Text(
                     'Choose Veterinarian',
@@ -485,8 +424,69 @@ class _ScheduleVetScreenState extends ConsumerState<ScheduleVetScreen> {
                   ),
                   const SizedBox(height: 20),
 
+                  // Date Picker
+                  const Text(
+                    'Select Date',
+                    style: TextStyle(
+                      color: AppColors.text,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: () => _selectDate(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: AppColors.background,
+                          width: 2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: .06),
+                            blurRadius: 12,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.calendar_today_outlined,
+                            color: AppColors.accent,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              _selectedDate == null
+                                  ? 'Select appointment date'
+                                  : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
+                              style: TextStyle(
+                                color: _selectedDate == null
+                                    ? AppColors.lightText
+                                    : AppColors.text,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                          Icon(
+                            Icons.arrow_forward_ios,
+                            color: AppColors.lightText,
+                            size: 16,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
                   // Time Slots
-                  if (_selectedVet != null) ...[
+                  if (_selectedDate != null) ...[
                     const Text(
                       'Available Time Slots',
                       style: TextStyle(

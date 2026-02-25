@@ -1,4 +1,4 @@
-import 'package:velp_lite/core/models/pet_model.dart';
+import 'package:velp_lite/features/home/data/models/pet_model.dart';
 import 'package:velp_lite/core/services/database_helper.dart';
 
 class PetDbHelper {
@@ -10,17 +10,16 @@ class PetDbHelper {
     final db = await DatabaseHelper.instance.database;
     try {
       final id = await db.insert('pets', pet.toMap());
-      pet.id = id;
-      return pet;
+      return pet.copyWith(id: id);
     } catch (e) {
       throw Exception('Failed to create pet: $e');
     }
   }
 
-  Future<List<PetModel>> getPets() async {
+  Future<List<PetModel>> getPets(int ownerId) async {
     final db = await DatabaseHelper.instance.database;
     try {
-      final List<Map<String, dynamic>> maps = await db.query('pets');
+      final List<Map<String, dynamic>> maps = await db.query('pets', where: 'owner_id = ?', whereArgs: [ownerId]);
       return maps.map((m) => PetModel.fromMap(m)).toList();
     } catch (e) {
       throw Exception('Failed to get pets: $e');

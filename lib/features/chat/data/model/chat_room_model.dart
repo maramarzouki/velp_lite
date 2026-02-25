@@ -1,4 +1,4 @@
-import 'package:velp_lite/core/entities/chat_room_entity.dart';
+import 'package:velp_lite/features/chat/data/entity/chat_room_entity.dart';
 
 class ChatRoomModel {
   int? id;

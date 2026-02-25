@@ -1,4 +1,4 @@
-import 'package:velp_lite/core/entities/pet_entity.dart';
+import 'package:velp_lite/features/home/data/entity/pet_entity.dart';
 
 class PetModel {
   int? id;
@@ -84,4 +84,28 @@ class PetModel {
       userID: entity.userID,
     );
   }
+
+  PetModel copyWith({
+    int? id,
+    String? name,
+    String? species,
+    String? breed,
+    DateTime? birthDate,
+    String? gender,
+    double? weight,
+    String? color,
+    String? chipNumber,
+    int? userID,
+  }) => PetModel(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    species: species ?? this.species,
+    breed: breed ?? this.breed,
+    birthDate: birthDate ?? this.birthDate,
+    gender: gender ?? this.gender,
+    weight: weight ?? this.weight,
+    color: color ?? this.color,
+    chipNumber: chipNumber ?? this.chipNumber,
+    userID: userID ?? this.userID,
+  );
 }

@@ -1,4 +1,4 @@
-import 'package:velp_lite/core/models/chat_room_model.dart';
+import 'package:velp_lite/features/chat/data/model/chat_room_model.dart';
 import 'package:velp_lite/core/services/database_helper.dart';
 
 class ChatRoomDbHelper {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:velp_lite/core/entities/user_entity.dart';
+import 'package:velp_lite/features/auth/data/entity/user_entity.dart';
 import 'package:velp_lite/core/providers/user_providers.dart';
-import 'package:velp_lite/core/repositories/user_repository.dart';
+import 'package:velp_lite/features/auth/data/repository/user_repository.dart';
 
 class UserViewModel extends AsyncNotifier<UserEntity> {
   late final UserRepository _repo;

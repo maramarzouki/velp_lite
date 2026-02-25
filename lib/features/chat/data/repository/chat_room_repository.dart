@@ -1,5 +1,5 @@
-import 'package:velp_lite/core/entities/chat_room_entity.dart';
-import 'package:velp_lite/core/models/chat_room_model.dart';
+import 'package:velp_lite/features/chat/data/entity/chat_room_entity.dart';
+import 'package:velp_lite/features/chat/data/model/chat_room_model.dart';
 import 'package:velp_lite/core/services/chat_room_db_helper.dart';
 
 class ChatRoomRepository {

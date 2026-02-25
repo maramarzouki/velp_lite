@@ -1,4 +1,4 @@
-import 'package:velp_lite/core/entities/message_entity.dart';
+import 'package:velp_lite/features/chat/data/entity/message_entity.dart';
 
 class MessageModel {
   int? id;

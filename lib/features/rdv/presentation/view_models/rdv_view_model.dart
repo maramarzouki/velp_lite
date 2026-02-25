@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:velp_lite/core/entities/rdv_entity.dart';
-import 'package:velp_lite/core/providers/rdv_providers.dart';
+import 'package:velp_lite/features/rdv/data/entity/rdv_entity.dart';
+import 'package:velp_lite/features/rdv/presentation/view_models/rdv_providers.dart';
 import 'package:velp_lite/features/rdv/data/repository/rdv_repository.dart';
 
 class RdvViewModel extends AsyncNotifier<List<RdvEntity>> {
   late final RdvRepository repo;
+  final int petID;
+
+  RdvViewModel({required this.petID});
 
   @override
   Future<List<RdvEntity>> build() async {
     debugPrint('Building RdvViewModel');
     repo = ref.read(rdvRepositoryProvider);
     debugPrint('RdvViewModel built');
-    return await repo.getRdvs();
+    return await repo.getRdvs(petID);
   }
 
   Future<RdvEntity> addRdv(RdvEntity rdv) async {

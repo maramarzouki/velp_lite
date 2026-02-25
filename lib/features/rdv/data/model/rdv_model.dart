@@ -1,4 +1,4 @@
-import 'package:velp_lite/core/entities/rdv_entity.dart';
+import 'package:velp_lite/features/rdv/data/entity/rdv_entity.dart';
 
 class RdvModel {
   int? id;

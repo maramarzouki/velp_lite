@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:velp_lite/core/entities/message_entity.dart';
+import 'package:velp_lite/features/chat/data/entity/message_entity.dart';
 import 'package:velp_lite/core/providers/message_providers.dart';
-import 'package:velp_lite/core/repositories/message_repository.dart';
+import 'package:velp_lite/features/chat/data/repository/message_repository.dart';
 
 class MessageViewModel extends AsyncNotifier<List<MessageEntity>> {
   late final MessageRepository _repo;

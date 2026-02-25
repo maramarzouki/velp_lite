@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:velp_lite/core/entities/rdv_entity.dart';
+import 'package:velp_lite/features/rdv/data/entity/rdv_entity.dart';
 import 'package:velp_lite/core/services/rdv_db_helper.dart';
 import 'package:velp_lite/features/rdv/data/model/rdv_model.dart';
 
@@ -15,9 +15,9 @@ class RdvRepository {
     return createdRdv.toEntity();
   }
 
-  Future<List<RdvEntity>> getRdvs() async {
+  Future<List<RdvEntity>> getRdvs(int petId) async {
     debugPrint('Getting Rdvs');
-    final rdvs = await db.getRdvs();
+    final rdvs = await db.getRdvs(petId);
     debugPrint('Rdvs: ${rdvs.length}');
     return rdvs.map((e)=>e.toEntity()).toList();
   }

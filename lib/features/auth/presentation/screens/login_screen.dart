@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:velp_lite/core/entities/user_entity.dart';
+import 'package:velp_lite/features/auth/data/entity/user_entity.dart';
 import 'package:velp_lite/core/providers/user_providers.dart';
 import 'package:velp_lite/core/theme/app_colors.dart';
 import 'package:velp_lite/core/validators/validators.dart';
@@ -46,9 +46,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             .loginUser(userEntity);
         await prefs.setInt('user_id', user.id!);
         if (user.id != null) {
-          Navigator.push(
+          Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (_) => HomeScreen()),
+            (route) => false,
           );
         } else {
           setState(() {

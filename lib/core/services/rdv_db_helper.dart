@@ -21,10 +21,10 @@ class RdvDbHelper {
     }
   }
 
-  Future<List<RdvModel>> getRdvs() async {
+  Future<List<RdvModel>> getRdvs(int petId) async {
     final db = await DatabaseHelper.instance.database;
     try {
-      final List<Map<String, dynamic>> maps = await db.query('rdvs');
+      final List<Map<String, dynamic>> maps = await db.query('rdvs', where: 'animal_id = ?', whereArgs: [petId]);
       return maps.map((m) => RdvModel.fromMap(m)).toList();
     } catch (e) {
       throw Exception('Failed to get rdvs: $e');

@@ -1,4 +1,4 @@
-import 'package:velp_lite/core/models/message_model.dart';
+import 'package:velp_lite/features/chat/data/model/message_model.dart';
 import 'package:velp_lite/core/services/database_helper.dart';
 
 class MessageDbHelper {

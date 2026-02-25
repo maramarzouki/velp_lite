@@ -1,5 +1,5 @@
-import 'package:velp_lite/core/entities/pet_entity.dart';
-import 'package:velp_lite/core/models/pet_model.dart';
+import 'package:velp_lite/features/home/data/entity/pet_entity.dart';
+import 'package:velp_lite/features/home/data/models/pet_model.dart';
 import 'package:velp_lite/core/services/pet_db_helper.dart';
 
 class PetRepository {
@@ -14,8 +14,8 @@ class PetRepository {
     return createdPet.toEntity();
   }
 
-  Future<List<PetEntity>> getPets() async {
-    final pets = await db.getPets();
+  Future<List<PetEntity>> getPets(int ownerId) async {
+    final pets = await db.getPets(ownerId);
     return pets.map((e) => e.toEntity()).toList();
   }
 

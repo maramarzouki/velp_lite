@@ -1,5 +1,5 @@
-import 'package:velp_lite/core/entities/message_entity.dart';
-import 'package:velp_lite/core/models/message_model.dart';
+import 'package:velp_lite/features/chat/data/entity/message_entity.dart';
+import 'package:velp_lite/features/chat/data/model/message_model.dart';
 import 'package:velp_lite/core/services/message_db_helper.dart';
 
 class MessageRepository {

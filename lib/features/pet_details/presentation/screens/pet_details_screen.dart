@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:velp_lite/core/entities/pet_entity.dart';
-import 'package:velp_lite/core/entities/rdv_entity.dart';
-import 'package:velp_lite/core/providers/pet_providers.dart';
-import 'package:velp_lite/core/providers/rdv_providers.dart';
+import 'package:velp_lite/features/home/data/entity/pet_entity.dart';
+import 'package:velp_lite/features/rdv/data/entity/rdv_entity.dart';
+import 'package:velp_lite/features/rdv/presentation/view_models/rdv_providers.dart';
 import 'package:velp_lite/core/theme/app_colors.dart';
 import 'package:velp_lite/features/pet_details/presentation/screens/update_details_screen.dart';
 import 'package:velp_lite/features/rdv/presentation/screens/schedule_vet_screen.dart';
@@ -44,10 +43,10 @@ class _PetDetailsScreenState extends ConsumerState<PetDetailsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final rdvVMProvider = ref.watch(rdvViewModelProvider);
+    final rdvVMProvider = ref.watch(rdvViewModelProvider(_pet.id!));
 
     final List<RdvEntity> appointments = rdvVMProvider.when(
-      data: (data) => data.where((r) => r.animalID == _pet.id).toList(),
+      data: (data) => data,
       error: (error, stackTrace) => [],
       loading: () => [],
     );
@@ -203,7 +202,7 @@ class _PetDetailsScreenState extends ConsumerState<PetDetailsScreen>
                               child: _buildStatCard(
                                 emoji: '⏱️',
                                 value: _pet.ageLabel.toString(),
-                                label: '',
+                                label: 'Old',
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -272,27 +271,56 @@ class _PetDetailsScreenState extends ConsumerState<PetDetailsScreen>
                                     builder: (_) =>
                                         ScheduleVetScreen(pet: _pet),
                                   ),
-                                );
+                                ).then((result) {
+                                  debugPrint(
+                                    'result from after schedule vet screen: $result',
+                                  );
+                                  if (result != null) {
+                                    _tabController.animateTo(1);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.check_circle,
+                                              color: AppColors.white,
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: Text(
+                                                'Appointment scheduled!',
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        backgroundColor: AppColors.accent,
+                                        behavior: SnackBarBehavior.floating,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        duration: const Duration(seconds: 4),
+                                      ),
+                                    );
+                                  }
+                                });
                               },
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: _buildActionButton(
-                              label: 'Edit Profile',
+                              label: 'Edit Pet',
                               icon: Icons.edit_outlined,
                               color: AppColors.secondary,
                               onPressed: () async {
-                                final updated = await Navigator.push<PetEntity>(
+                                await Navigator.push<PetEntity>(
                                   context,
                                   MaterialPageRoute(
                                     builder: (_) => UpdatePetScreen(pet: _pet),
                                   ),
                                 );
-                                if (updated != null) {
-                                  setState(() => _pet = updated);
-                                  ref.refresh(petViewModelProvider);
-                                }
                               },
                             ),
                           ),
@@ -778,7 +806,7 @@ Widget _buildAppointmentCard(RdvEntity appt) {
                 // ),
                 const SizedBox(height: 4),
                 Text(
-                  "Dr. ${appt.vet}",
+                  appt.vet,
                   style: TextStyle(color: AppColors.lightText, fontSize: 14),
                 ),
               ],

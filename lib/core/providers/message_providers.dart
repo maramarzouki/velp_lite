@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:velp_lite/core/entities/message_entity.dart';
+import 'package:velp_lite/features/chat/data/entity/message_entity.dart';
 import 'package:velp_lite/core/providers/user_providers.dart';
-import 'package:velp_lite/core/repositories/message_repository.dart';
+import 'package:velp_lite/features/chat/data/repository/message_repository.dart';
 import 'package:velp_lite/core/services/message_db_helper.dart';
-import 'package:velp_lite/core/view_models/message_view_model.dart';
+import 'package:velp_lite/features/chat/presentation/view_models/message_view_model.dart';
 
 final messageDbHelperProvider = Provider<MessageDbHelper>(
   (ref) => MessageDbHelper.instance,

@@ -1,4 +1,4 @@
-import 'package:velp_lite/core/entities/user_entity.dart';
+import 'package:velp_lite/features/auth/data/entity/user_entity.dart';
 
 class UserModel {
   int? id;

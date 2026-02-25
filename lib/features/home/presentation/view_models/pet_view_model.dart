@@ -1,24 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:velp_lite/core/entities/pet_entity.dart';
+import 'package:velp_lite/features/home/data/entity/pet_entity.dart';
 import 'package:velp_lite/core/providers/pet_providers.dart';
 import 'package:velp_lite/features/home/data/repository/pet_repository.dart';
 
 class PetViewModel extends AsyncNotifier<List<PetEntity>> {
   late final PetRepository repo;
+  final int ownerId;
+
+  PetViewModel({required this.ownerId});
 
   @override
   Future<List<PetEntity>> build() async {
     repo = await ref.read(petRepositoryProvider);
-    return await repo.getPets();
+    return await repo.getPets(ownerId);
   }
 
   Future<void> addPet(PetEntity pet) async {
     state = const AsyncLoading();
     try {
-      final newPet = await repo.addPet(pet);
-      final createdList = [...state.value ?? <PetEntity>[], newPet];
-      state = AsyncData<List<PetEntity>>(createdList);
+      await repo.addPet(pet);
+      // final createdList = [...state.value ?? <PetEntity>[], newPet];
+      final pets = await repo.getPets(ownerId);
+      state = AsyncData<List<PetEntity>>(pets);
     } catch (e) {
       debugPrint('Error adding pet: $e');
       state = AsyncError(e, StackTrace.current);

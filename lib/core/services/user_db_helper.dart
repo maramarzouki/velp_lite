@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:velp_lite/core/models/user_model.dart';
+import 'package:velp_lite/features/auth/data/model/user_model.dart';
 import 'package:velp_lite/core/services/database_helper.dart';
 import 'package:bcrypt/bcrypt.dart';
 
